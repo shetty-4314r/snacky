@@ -294,10 +294,11 @@ private:
         Console::gotoxy(0, 0);
 
         std::string frame;
-        const std::size_t scoreLineMax = std::string("Score: ").size() + 20 +
-                                         std::string("   High Score: ").size() + 20 +
-                                         std::string("   [PAUSED - press P]\n").size();
-        const std::size_t controlsLine = std::string("Controls: W A S D to move | P to pause\n").size();
+        constexpr std::size_t scoreLabelLen = sizeof("Score: ") - 1;
+        constexpr std::size_t highScoreLabelLen = sizeof("   High Score: ") - 1;
+        constexpr std::size_t pausedLabelLen = sizeof("   [PAUSED - press P]\n") - 1;
+        constexpr std::size_t controlsLine = sizeof("Controls: W A S D to move | P to pause\n") - 1;
+        const std::size_t scoreLineMax = scoreLabelLen + 20 + highScoreLabelLen + 20 + pausedLabelLen;
         frame.reserve((width_ + 1) * height_ + scoreLineMax + controlsLine);
 
         frame += "Score: " + std::to_string(score_) + "   High Score: " + std::to_string(highScore_);
@@ -366,8 +367,8 @@ private:
             return;
         }
 
-        std::uniform_int_distribution<std::size_t> cellDist(0, freeCells.size() - 1);
-        food_ = freeCells[cellDist(rng_)];
+        std::uniform_int_distribution<int> cellDist(0, static_cast<int>(freeCells.size()) - 1);
+        food_ = freeCells[static_cast<std::size_t>(cellDist(rng_))];
     }
 
     static bool isOppositeDirection(Direction current, Direction next) {
@@ -394,6 +395,8 @@ private:
         std::ofstream highscoreFile("highscore.txt", std::ios::trunc);
         if (highscoreFile.is_open()) {
             highscoreFile << highScore_;
+        } else {
+            std::cerr << "Warning: Could not save high score.\n";
         }
     }
 };
