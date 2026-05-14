@@ -293,7 +293,7 @@ private:
         Console::gotoxy(0, 0);
 
         std::string frame;
-        frame.reserve((width_ + 2) * (height_ + 3));
+        frame.reserve((width_ + 1) * (height_ + 2) + 64);
 
         frame += "Score: " + std::to_string(score_) + "   High Score: " + std::to_string(highScore_);
         frame += paused_ ? "   [PAUSED - press P]\n" : "\n";
@@ -359,8 +359,8 @@ private:
     }
 
     void loadHighScore() {
-        std::ifstream input("highscore.txt");
-        if (input >> highScore_) {
+        std::ifstream highscoreFile("highscore.txt");
+        if (highscoreFile >> highScore_) {
             return;
         }
         highScore_ = 0;
@@ -372,8 +372,10 @@ private:
         }
 
         highScore_ = score_;
-        std::ofstream output("highscore.txt", std::ios::trunc);
-        output << highScore_;
+        std::ofstream highscoreFile("highscore.txt", std::ios::trunc);
+        if (highscoreFile.is_open()) {
+            highscoreFile << highScore_;
+        }
     }
 };
 

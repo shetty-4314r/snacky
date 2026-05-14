@@ -4,7 +4,7 @@ Complete Snake Game in C++ (console/terminal, single file).
 
 ## File
 
-- `/home/runner/work/snacky/snacky/snake_game.cpp`
+- `snake_game.cpp`
 
 ## 1) Game logic
 
