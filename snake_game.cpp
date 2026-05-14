@@ -294,8 +294,11 @@ private:
         Console::gotoxy(0, 0);
 
         std::string frame;
-        const std::size_t uiTextBuffer = 160;  // score line + pause text + controls line
-        frame.reserve((width_ + 1) * (height_ + 2) + uiTextBuffer);
+        const std::size_t scoreLineMax = std::string("Score: ").size() + 20 +
+                                         std::string("   High Score: ").size() + 20 +
+                                         std::string("   [PAUSED - press P]\n").size();
+        const std::size_t controlsLine = std::string("Controls: W A S D to move | P to pause\n").size();
+        frame.reserve((width_ + 1) * height_ + scoreLineMax + controlsLine);
 
         frame += "Score: " + std::to_string(score_) + "   High Score: " + std::to_string(highScore_);
         frame += paused_ ? "   [PAUSED - press P]\n" : "\n";
@@ -324,13 +327,14 @@ private:
     }
 
     bool showGameOverAndAskRestart(const Input& input) const {
+        constexpr int restartPollDelayMs = 40;
         Console::gotoxy(0, height_ + 3);
         std::cout << "Game Over! Final Score: " << score_
                   << " | Press R to restart or Q to quit: " << std::flush;
 
         while (true) {
             if (!input.kbhit()) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(40));
+                std::this_thread::sleep_for(std::chrono::milliseconds(restartPollDelayMs));
                 continue;
             }
 
