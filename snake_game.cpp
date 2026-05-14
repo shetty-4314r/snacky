@@ -9,6 +9,7 @@
 #include <random>
 #include <string>
 #include <thread>
+#include <vector>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -293,7 +294,8 @@ private:
         Console::gotoxy(0, 0);
 
         std::string frame;
-        frame.reserve((width_ + 1) * (height_ + 2) + 150);
+        const std::size_t uiTextBuffer = 160;  // score line + pause text + controls line
+        frame.reserve((width_ + 1) * (height_ + 2) + uiTextBuffer);
 
         frame += "Score: " + std::to_string(score_) + "   High Score: " + std::to_string(highScore_);
         frame += paused_ ? "   [PAUSED - press P]\n" : "\n";
@@ -343,12 +345,25 @@ private:
     }
 
     void spawnFood() {
-        std::uniform_int_distribution<int> xDist(1, width_ - 2);
-        std::uniform_int_distribution<int> yDist(1, height_ - 2);
+        std::vector<Point> freeCells;
+        freeCells.reserve(static_cast<std::size_t>((width_ - 2) * (height_ - 2)));
 
-        do {
-            food_ = {xDist(rng_), yDist(rng_)};
-        } while (snake_.occupies(food_));
+        for (int y = 1; y < height_ - 1; ++y) {
+            for (int x = 1; x < width_ - 1; ++x) {
+                Point candidate{x, y};
+                if (!snake_.occupies(candidate)) {
+                    freeCells.push_back(candidate);
+                }
+            }
+        }
+
+        if (freeCells.empty()) {
+            gameOver_ = true;
+            return;
+        }
+
+        std::uniform_int_distribution<std::size_t> cellDist(0, freeCells.size() - 1);
+        food_ = freeCells[cellDist(rng_)];
     }
 
     static bool isOppositeDirection(Direction current, Direction next) {
