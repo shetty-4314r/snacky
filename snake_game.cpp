@@ -293,7 +293,7 @@ private:
         Console::gotoxy(0, 0);
 
         std::string frame;
-        frame.reserve((width_ + 1) * (height_ + 2) + 64);
+        frame.reserve((width_ + 1) * (height_ + 2) + 150);
 
         frame += "Score: " + std::to_string(score_) + "   High Score: " + std::to_string(highScore_);
         frame += paused_ ? "   [PAUSED - press P]\n" : "\n";
